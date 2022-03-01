@@ -1,105 +1,24 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import { Text, View } from 'react-native';
 import ButtonCalc from '../components/ButtonCalc';
 import { styles } from '../theme/appTheme';
-
-enum Operators {
-  addition, substraction, multiplication, division
-}
+import { useCalculator } from '../hooks/useCalculator';
 
 const CalculatorScreen = () => {
 
-  const [ previousNumber, setPreviousNumber ] = useState('0')
-  const [ number, setNumber ] = useState('0');
-
-  const lastOperation = useRef<Operators>();
-
-  const clean = () => {
-    setNumber('0');
-    setPreviousNumber('0');
-  };
-
-  const buildNumber = ( textNumber: string ) => {
-    
-    // not accept double point
-    if ( number.includes('.') && textNumber === '.' ) return;
-
-    if ( number.startsWith('0') || number.startsWith('-0') ) {
-      
-      // decimal point
-      if ( textNumber === '.' ) {
-        setNumber( number + textNumber );
-
-      // another cero and there is a point
-      } else if( textNumber === '0' && number.includes('.') ) {
-        setNumber( number + textNumber );
-
-      // diferent than cero and don't have a point
-      } else if( textNumber !== '0' && !number.includes('.') ) {
-        setNumber( textNumber );
-        
-      // avoid 0000.0
-      } else if ( textNumber === '0' && !number.includes('.') ) {
-        setNumber( number );
-      } else {
-        setNumber( number + textNumber )
-      }
-      
-    } else {
-      setNumber( number + textNumber );
-    }
-  };
-
-  const positiveNegative = () => {
-    if ( number.includes('-') ) {
-      setNumber( number.replace('-', '') );
-    } else {
-      setNumber( '-' + number );
-    }
-  };
-
-  const btnDelete = () => {
-
-    // number have a value
-    if ( number.length === 1 ) {
-      setNumber('0')
-    // number have two values and start with negative
-    } else if ( number.length === 2 && number.startsWith('-') ) {
-      setNumber('0')
-    } else {
-      // delete last value
-      setNumber(number.slice(0, -1));
-    }
-  };
-
-  const changePreviousNumber = () => {
-    if ( number.endsWith('.') ) {
-      setPreviousNumber( number.slice(0,-1) );
-    } else {
-      setPreviousNumber( number );
-    }
-    setNumber('0');
-  };
-
-  const btnDivision = () => {
-    changePreviousNumber();
-    lastOperation.current = Operators.division;
-  }
-
-  const btnMultiplication = () => {
-    changePreviousNumber();
-    lastOperation.current = Operators.multiplication;
-  }
-
-  const btnAddition = () => {
-    changePreviousNumber();
-    lastOperation.current = Operators.addition;
-  }
-
-  const btnSubstraction = () => {
-    changePreviousNumber();
-    lastOperation.current = Operators.substraction;
-  }
+  const {
+    number,
+    previousNumber,
+    calculate,
+    clean,
+    positiveNegative,
+    buildNumber,
+    btnAddition,
+    btnSubstraction,
+    btnMultiplication,
+    btnDivision,
+    btnDelete
+  } = useCalculator();
 
   return (
     <View style={ styles.calculatorContainer }>
@@ -148,7 +67,7 @@ const CalculatorScreen = () => {
       <View style={ styles.row }>
         <ButtonCalc text="0" width action={ buildNumber } />
         <ButtonCalc text="." action={ buildNumber } />
-        <ButtonCalc text="=" color="#FF9427" action={ buildNumber } />
+        <ButtonCalc text="=" color="#FF9427" action={ calculate } />
       </View>        
 
     </View>
